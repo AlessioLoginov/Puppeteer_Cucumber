@@ -1,7 +1,7 @@
 const puppeteer = require("puppeteer");
 const chai = require("chai");
 const expect = chai.expect;
-const { Given, When, Then, Before, After } = require("cucumber");
+const { Given, When, Then, Before, After } = require("@cucumber/cucumber");
 const { clickElement } = require("../../lib/commands.js");
 
 let browser;
@@ -20,39 +20,40 @@ After(async function () {
   }
 });
 
-Given("user is on {string} page", async function (string) {
-  await this.page.goto(`${string}`, { waitUntil: 'networkidle0', timeout: 20000 });
+Given("I am on the booking page", async function () {
+  await this.page.goto("http://qamid.tmweb.ru/client/index.php", { waitUntil: 'networkidle0', timeout: 20000 });
 });
 
-When("user chooses a seat", async function () {
-  await clickElement (this.page, "a:nth-child(6)");
-  await clickElement (this.page, "a.movie-seances__time");
-  await clickElement (this.page, "div:nth-child(3) > span:nth-child(5)");
-  await clickElement (this.page, "button");
+Given("I select a movie session", async function () {
+  await clickElement(this.page, "a:nth-child(6)");
+  await clickElement(this.page, "a.movie-seances__time");
 });
 
-When("user chooses two seats", async function () {
-  await clickElement (this.page, "a:nth-child(6)");
-  await clickElement (this.page, "a.movie-seances__time");
-  await clickElement (this.page, "div:nth-child(3) > span:nth-child(5)");
-  await clickElement (this.page, "div:nth-child(3) > span:nth-child(6)");
-  await clickElement (this.page, "button");
+When("I choose {string} seat(s)", async function (number) {
+  if (number === "1") {
+    await clickElement(this.page, "div:nth-child(3) > span:nth-child(5)");
+  } else if (number === "2") {
+    await clickElement(this.page, "div:nth-child(3) > span:nth-child(5)");
+    await clickElement(this.page, "div:nth-child(3) > span:nth-child(6)");
+  }
 });
 
-When("user does not choose a seat", async function () {
-  await clickElement (this.page, "a:nth-child(6)");
-  await clickElement (this.page, "a.movie-seances__time");
+When("I proceed to checkout", async function () {
+  await clickElement(this.page, "button");
 });
 
-Then("user sees a message", async function () {
+Then("I should see the confirmation message", async function () {
   await this.page.waitForSelector("h2");
   const actual = await this.page.$eval("h2", (link) => link.textContent);
   const expected = "Вы выбрали билеты:";
   expect(actual).to.contain(expected);
 });
 
-Then("user sees the button become disabled", async function () {
+Then("the checkout button should be disabled", async function () {
+  await this.page.waitForSelector("button", { timeout: 5000 }); // ожидание кнопки
   const actual = await this.page.$eval("button", (link) => link.getAttribute("disabled"));
   const expected = "true";
   expect(actual).to.equal(expected);
 });
+
+

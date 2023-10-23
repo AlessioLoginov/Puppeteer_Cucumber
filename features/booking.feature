@@ -1,18 +1,21 @@
 Feature: Booking tickets
 
-  Scenario: Successfully booking a single seat
+  Background: 
     Given I am on the booking page
-    When I select a single seat
+    And I select a movie session
+
+  Scenario: Successfully booking a single seat
+    When I choose "1" seat
     And I proceed to checkout
-    Then I should see the confirmation page
+    Then I should see the confirmation message
 
   Scenario: Successfully booking two seats
-    Given I am on the booking page
-    When I select two seats
+    When I choose "2" seats
     And I proceed to checkout
-    Then I should see the confirmation page
+    Then I should see the confirmation message
 
   Scenario: Attempting to proceed without selecting a seat
-    Given I am on the booking page
-    When I proceed to checkout without selecting a seat
-    Then I should see an error message
+    Then the checkout button should be disabled
+
+
+
